@@ -1,0 +1,69 @@
+  :root {
+    --light-blue: #887ecb;
+    --blue: #50459b;
+  }
+
+  @font-face {
+    font-family: C64ProMono;
+    src: url(C64_Pro_Mono-STYLE.ttf);
+  }
+
+  body {
+    background-color: black;
+  }
+
+  #screen {
+    width: 40em;
+    height: 25em;
+    font-family: C64ProMono;
+    font-size: 15pt;
+    color: var(--light-blue);
+    background-color: var(--blue);
+    border: 2em solid var(--light-blue);
+  }
+
+  label.vrange {
+    position: relative;
+    top: 2em;
+    left: 2em;
+  }
+
+  input[type=range] {
+    -webkit-appearance: slider-vertical;
+    width: 1em;
+    height: 8em;
+    background: transparent;
+  }
+  input[type=range]:focus { outline: none; }
+  input[type=range]::-webkit-slider-runnable-track {
+    background-color: var(--light-blue);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 0.5em;
+    width: 1em;
+    background-color: var(--light-blue);
+  }
+
+  input[type=checkbox] {
+    -webkit-appearance: none;
+    height: 1em;
+    width: 1em;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: var(--light-blue);
+  }
+  input[type=checkbox]:checked {
+    content: "x";
+    background-color: white;
+  }
+
+  canvas {
+    width: 400px;
+    height: 128px;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
