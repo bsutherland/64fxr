@@ -1,0 +1,3 @@
+[submodule "jsSID"]
+	path = jsSID
+	url = https://github.com/jhohertz/jsSID.git
