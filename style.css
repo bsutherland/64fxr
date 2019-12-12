@@ -20,13 +20,32 @@
     color: var(--light-blue);
     background-color: var(--blue);
     border: 2em solid var(--light-blue);
+
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-gap: 0;
   }
 
-  label.vrange {
-    position: relative;
-    top: 2em;
-    left: 2em;
+  .radios {
+    display: grid;
+    grid-template-columns: 2em min-content;
+    grid-auto-rows: 1em;
+    grid-gap: 0;
   }
+
+  .sliders {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: 1em 5em;
+    grid-auto-columns: 4em;
+    grid-gap: 0;
+  }
+
+  .oscilloscope {
+
+  }
+
+  input:focus { outline: none; }
 
   input[type=range] {
     -webkit-appearance: slider-vertical;
@@ -34,7 +53,6 @@
     height: 8em;
     background: transparent;
   }
-  input[type=range]:focus { outline: none; }
   input[type=range]::-webkit-slider-runnable-track {
     background-color: var(--light-blue);
   }
@@ -43,6 +61,17 @@
     height: 0.5em;
     width: 1em;
     background-color: var(--light-blue);
+  }
+
+  input[type=radio] {
+    -webkit-appearance: none;
+    height: 1em;
+    width: 1em;
+    background-color: var(--light-blue);
+    border-radius: 0;
+  }
+  input[type=radio]:checked {
+    background-color: white;
   }
 
   input[type=checkbox] {
