@@ -39,6 +39,7 @@ SFXR = function(opts) {
 
   this.OFF = document.getElementById('OFF');
   this.LP = document.getElementById('LP');
+  this.BP = document.getElementById('BP');
   this.HP = document.getElementById('HP');
   this.FC = document.getElementById('FC');
   this.Q = document.getElementById('Q');
@@ -184,6 +185,7 @@ SFXR.prototype.pulsewidth = function() {
 SFXR.prototype.filtertype = function() {
   let x = 0;
   if (this.HP.checked) x |= 0x4;
+  if (this.BP.checked) x |= 0x2;
   if (this.LP.checked) x |= 0x1;
   this.filterres();
   this.synth.poke(0x18, (x<<4) | 0xf); // always full volume

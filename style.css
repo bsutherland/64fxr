@@ -20,15 +20,17 @@
     color: var(--light-blue);
     background-color: var(--blue);
     border: 2em solid var(--light-blue);
+  }
 
+  .twocol {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 10em min-content; /* left for radios */
     grid-gap: 0;
   }
 
   .radios {
     display: grid;
-    grid-template-columns: 2em min-content;
+    grid-template-columns: 2em min-content; /* radio button + label */
     grid-auto-rows: 1em;
     grid-gap: 0;
   }
@@ -50,7 +52,7 @@
   input[type=range] {
     -webkit-appearance: slider-vertical;
     width: 1em;
-    height: 8em;
+    height: 5em;
     background: transparent;
   }
   input[type=range]::-webkit-slider-runnable-track {
