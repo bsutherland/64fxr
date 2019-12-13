@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     model: jsSID.chip.model.MOS6581
   });
 });
-
 document.onkeydown = function(evt) {
   evt = evt || window.event;
   window.sfxr.keydown(event.key);
@@ -34,7 +33,8 @@ document.onkeyup = function(evt) {
 
 <div id="screen">
 
-  <div class="twocol">
+  <div class="container">
+    <div class="label">OSC1</div>
     <div class="radios">
       <input type="radio" name="waveform" id="noi" onclick="window.sfxr.waveforms()"></input>
       <label for="noi">noi</label>
@@ -63,7 +63,8 @@ document.onkeyup = function(evt) {
     </div>
   </div>
 
-  <div class="twocol">
+  <div class="container">
+    <div class="label">FILT</div>
     <div class="radios">
       <input type="radio" name="filter_type" id="OFF" onclick="window.sfxr.filtertype()"></input>
       <label for="OFF">off</label>

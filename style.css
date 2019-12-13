@@ -22,10 +22,15 @@
     border: 2em solid var(--light-blue);
   }
 
-  .twocol {
+  .container {
     display: grid;
-    grid-template-columns: 10em min-content; /* left for radios */
+    grid-template-columns: 4em 10em min-content; /* left for radios */
     grid-gap: 0;
+  }
+
+  .label {
+    writing-mode: vertical-lr;
+    text-orientation: upright;
   }
 
   .radios {

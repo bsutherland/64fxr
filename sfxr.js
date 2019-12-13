@@ -10,6 +10,8 @@ SFXR = function(opts) {
 
   var that = this;
 
+  pico.setup({cellsize: 256});
+
   this.synth = jsSID.synthFactory({
     quality: this.quality,
     clock: this.clock,
@@ -76,6 +78,7 @@ SFXR.prototype.process = function(L, R) {
         this.gfx.lineTo(i, half+3*half*R[i]);
       }
       this.gfx.stroke();
+      // console.log(R[0], R[1], R[2]);
     }
   } else {
     this.stop();
