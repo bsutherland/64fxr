@@ -46,13 +46,14 @@ SFXR = function(opts) {
   this.HP = document.getElementById('HP');
   this.FC = document.getElementById('FC');
   this.Q = document.getElementById('Q');
+  this.FM = document.getElementById('FM');
 
   this.palette = new Map(['light-blue', 'blue'].map(c => [
     c, getComputedStyle(document.documentElement).getPropertyValue('--'+c)
   ]));
   this.oscilloscope = document.getElementById('oscilloscope');
   this.gfx = this.oscilloscope.getContext('2d');
-  this.gfx.strokeStyle = this.palette.get('light-blue');
+  this.gfx.strokeStyle = 'white';
 
   this.initSID();
 };
@@ -76,10 +77,9 @@ SFXR.prototype.process = function(L, R) {
       const half = this.oscilloscope.height/2;
       this.gfx.moveTo(0, half);
       for (var i = 0; i < L.length; i++) {
-        this.gfx.lineTo(i, half+3*half*R[i]);
+        this.gfx.lineTo(i, half+3*half*L[i]);
       }
       this.gfx.stroke();
-      // console.log(R[0], R[1], R[2]);
     }
   } else {
     this.stop();
@@ -204,6 +204,10 @@ SFXR.prototype.waveforms = function(osc) {
 }
 
 SFXR.prototype.ctrlbits = function(osc) {
+  if (this.ring.checked) {
+    this.WAVEFORMS[1][3].checked = true;
+    this.waveforms(1);
+  }
   const x = (this.ring.checked ? 4 : 0) | (this.sync.checked ? 2 : 0);
   this.ctrl[osc] = (this.ctrl[osc] & 0xf9) | x;
   this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
@@ -236,7 +240,6 @@ SFXR.prototype.clearGate = function(osc) {
 }
 
 SFXR.prototype.trigger = function(osc, note) {
-  console.log(note);
   const NOTEMAP = {
     'c-0': 0x4540,
     'c#0': 0x495e,
@@ -266,10 +269,12 @@ SFXR.prototype.trigger = function(osc, note) {
   // because Chrome requires a click before sound can start.
   this.play();
 
-  // Set frequency to C-3
-  // http://sta.c64.org/cbm64sndfreq.html
   this.synth.poke(0x01 + this.offset(osc), reg16 >> 8);
   this.synth.poke(0x00 + this.offset(osc), reg16 & 0xff);
+
+  const f2 = (reg16 * this.FM.value) & 0xffff;
+  this.synth.poke(0x01 + this.offset(osc - 1), f2 >> 8);
+  this.synth.poke(0x00 + this.offset(osc - 1), f2 & 0xff);
 
   this.ctrl[osc] |= 1;
   this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
