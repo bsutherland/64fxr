@@ -220,8 +220,8 @@ SFXR.prototype.filtertype = function() {
 
 SFXR.prototype.filterres = function() {
   const x = this.Q.value << 4;
-  const y = this.OFF.checked ? 0 : 1;
-  this.synth.poke(0x17, x | y); // make sure filter is enabled on ch1
+  const y = this.OFF.checked ? 0 : 2; // enable/disable filter on ch2
+  this.synth.poke(0x17, x | y);
 }
 
 SFXR.prototype.filtercutoff = function() {
