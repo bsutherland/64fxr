@@ -36,30 +36,67 @@ document.onkeyup = function(evt) {
   <div class="container">
     <div class="label">OSC1</div>
     <div class="radios">
-      <input type="radio" name="waveform" id="noi" onclick="window.sfxr.waveforms()"></input>
-      <label for="noi">noi</label>
+      <input type="radio" name="waveform1" id="noi1" onclick="window.sfxr.waveforms(0)"></input>
+      <label for="noi1">noi</label>
 
-      <input type="radio" name="waveform" id="pul" onclick="window.sfxr.waveforms()" checked="checked"></input>
-      <label for="pul">pul</label>
+      <input type="radio" name="waveform1" id="pul1" onclick="window.sfxr.waveforms(0)" checked="checked"></input>
+      <label for="pul1">pul</label>
 
-      <input type="radio" name="waveform" id="saw" onclick="window.sfxr.waveforms()"></input>
-      <label for="saw">saw</label>
+      <input type="radio" name="waveform1" id="saw1" onclick="window.sfxr.waveforms(0)"></input>
+      <label for="saw1">saw</label>
 
-      <input type="radio" name="waveform" id="tri" onclick="window.sfxr.waveforms()"></input>
-      <label for="tri">tri</label>
+      <input type="radio" name="waveform1" id="tri1" onclick="window.sfxr.waveforms(0)"></input>
+      <label for="tri1">tri</label>
     </div>
 
     <div class="sliders">
-      <label for="A">A</label>
-      <input type="range" id="A" name="A" value="2" min="0" max="15" oninput="window.sfxr.attack()"></input>
-      <label for="D">D</label>
-      <input type="range" id="D" name="D" value="8" min="0" max="15" oninput="window.sfxr.decay()"></input>
-      <label for="S">S</label>
-      <input type="range" id="S" name="S" value="4" min="0" max="15" oninput="window.sfxr.sustain()"></input>
-      <label for="R">R</label>
-      <input type="range" id="R" name="R" value="4" min="0" max="15" oninput="window.sfxr.release()"></input>
-      <label for="PW">PW</label>
-      <input type="range" id="PW" name="PW" value="1024" min="0" max="4095" oninput="window.sfxr.pulsewidth()"></input>
+      <label for="A1">A</label>
+      <input type="range" id="A1" name="A1" value="2" min="0" max="15" oninput="window.sfxr.attack(0)"></input>
+      <label for="D1">D</label>
+      <input type="range" id="D1" name="D1" value="8" min="0" max="15" oninput="window.sfxr.decay(0)"></input>
+      <label for="S1">S</label>
+      <input type="range" id="S1" name="S1" value="4" min="0" max="15" oninput="window.sfxr.sustain(0)"></input>
+      <label for="R1">R</label>
+      <input type="range" id="R1" name="R1" value="4" min="0" max="15" oninput="window.sfxr.release(0)"></input>
+      <label for="PW1">PW</label>
+      <input type="range" id="PW1" name="PW1" value="1024" min="0" max="4095" oninput="window.sfxr.pulsewidth(0)"></input>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="label">OSC2</div>
+    <div class="radios">
+      <input type="radio" name="waveform2" id="noi2" onclick="window.sfxr.waveforms(1)"></input>
+      <label for="noi2">noi</label>
+
+      <input type="radio" name="waveform2" id="pul2" onclick="window.sfxr.waveforms(1)" checked="checked"></input>
+      <label for="pul2">pul</label>
+
+      <input type="radio" name="waveform2" id="saw2" onclick="window.sfxr.waveforms(1)"></input>
+      <label for="saw2">saw</label>
+
+      <input type="radio" name="waveform2" id="tri2" onclick="window.sfxr.waveforms(1)"></input>
+      <label for="tri2">tri</label>
+    </div>
+
+    <div class="sliders">
+      <label for="A2">A</label>
+      <input type="range" id="A2" name="A2" value="2" min="0" max="15" oninput="window.sfxr.attack(1)"></input>
+      <label for="D2">D</label>
+      <input type="range" id="D2" name="D2" value="8" min="0" max="15" oninput="window.sfxr.decay(1)"></input>
+      <label for="S2">S</label>
+      <input type="range" id="S2" name="S2" value="4" min="0" max="15" oninput="window.sfxr.sustain(1)"></input>
+      <label for="R2">R</label>
+      <input type="range" id="R2" name="R2" value="4" min="0" max="15" oninput="window.sfxr.release(1)"></input>
+      <label for="PW2">PW</label>
+      <input type="range" id="PW2" name="PW2" value="1024" min="0" max="4095" oninput="window.sfxr.pulsewidth(1)"></input>
+    </div>
+
+    <div class="radios">
+      <input type="checkbox" name="ring" id="ring" onclick="window.sfxr.ctrlbits(1)"></input>
+      <label for="ring">ring</label>
+      <input type="checkbox" name="sync" id="sync" onclick="window.sfxr.ctrlbits(1)"></input>
+      <label for="sync">sync</label>
     </div>
   </div>
 

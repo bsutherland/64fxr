@@ -24,7 +24,7 @@
 
   .container {
     display: grid;
-    grid-template-columns: 4em 10em min-content; /* left for radios */
+    grid-template-columns: 3em 8em 16em min-content; /* left for radios */
     grid-gap: 0;
   }
 
@@ -44,7 +44,7 @@
     display: grid;
     grid-auto-flow: column;
     grid-template-rows: 1em 5em;
-    grid-auto-columns: 4em;
+    grid-auto-columns: 3em;
     grid-gap: 0;
   }
 

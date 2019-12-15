@@ -8,8 +8,6 @@ SFXR = function(opts) {
   this.finished = false;
   this.ready = false;
 
-  var that = this;
-
   pico.setup({cellsize: 256});
 
   this.synth = jsSID.synthFactory({
@@ -24,20 +22,23 @@ SFXR = function(opts) {
   this.nextFrameNum = 0;
   this.samplesToNextFrame = 0;
 
-  this.ad = 0;
-  this.sr = 0;
-  this.pw = 0;
-  this.ctrl = 0;
+  this.ad = [0, 0];
+  this.sr = [0, 0];
+  this.pw = [0, 0];
+  this.ctrl = [0, 0];
 
-  this.A = document.getElementById('A');
-  this.D = document.getElementById('D');
-  this.S = document.getElementById('S');
-  this.R = document.getElementById('R');
-  this.PW = document.getElementById('PW');
-
+  ['A', 'D', 'S', 'R', 'PW'].forEach(p => {
+    this[p] = [0, 1].map(i => {
+      const id = p + (i+1);
+      return document.getElementById(id);
+    });
+  });
   this.WAVEFORMS = [
-    'noi', 'pul', 'saw', 'tri'
-  ].map(id => document.getElementById(id));
+    ['noi1', 'pul1', 'saw1', 'tri1'],
+    ['noi2', 'pul2', 'saw2', 'tri2'],
+  ].map(ids => ids.map(id => document.getElementById(id)));
+  this.ring = document.getElementById('ring');
+  this.sync = document.getElementById('sync');
 
   this.OFF = document.getElementById('OFF');
   this.LP = document.getElementById('LP');
@@ -49,8 +50,8 @@ SFXR = function(opts) {
   this.palette = new Map(['light-blue', 'blue'].map(c => [
     c, getComputedStyle(document.documentElement).getPropertyValue('--'+c)
   ]));
-  this.osc = document.getElementById('oscilloscope');
-  this.gfx = this.osc.getContext('2d');
+  this.oscilloscope = document.getElementById('oscilloscope');
+  this.gfx = this.oscilloscope.getContext('2d');
   this.gfx.strokeStyle = this.palette.get('light-blue');
 
   this.initSID();
@@ -70,9 +71,9 @@ SFXR.prototype.process = function(L, R) {
         R[i] = L[i];
       }
       // draw oscilloscope
-      this.gfx.clearRect(0, 0, this.osc.width, this.osc.height);
+      this.gfx.clearRect(0, 0, this.oscilloscope.width, this.oscilloscope.height);
       this.gfx.beginPath();
-      const half = this.osc.height/2;
+      const half = this.oscilloscope.height/2;
       this.gfx.moveTo(0, half);
       for (var i = 0; i < L.length; i++) {
         this.gfx.lineTo(i, half+3*half*R[i]);
@@ -86,12 +87,15 @@ SFXR.prototype.process = function(L, R) {
 };
 
 SFXR.prototype.initSID = function() {
-  this.attack();
-  this.decay();
-  this.sustain();
-  this.release();
-  this.pulsewidth();
-  this.waveforms();
+  for (var i = 0; i < 2; i++) {
+    this.attack(i);
+    this.decay(i);
+    this.sustain(i);
+    this.release(i);
+    this.pulsewidth(i);
+    this.waveforms(i);
+    this.ctrlbits(i);
+  }
   this.filtertype();
   this.filtercutoff();
   this.filterres();
@@ -111,7 +115,7 @@ SFXR.prototype.stop = function() {
 
 SFXR.prototype.keyup = function(key) {
   if (this.lastPlayedKey == key) {
-    this.clearGate();
+    this.clearGate(1);
     this.lastPlayedKey = null;
   }
 }
@@ -145,7 +149,7 @@ SFXR.prototype.keydown = function(key) {
   const note = KEYMAP[key.toLowerCase()];
   if (note && this.lastPlayedKey != key) {
     this.lastPlayedKey = key;
-    this.trigger(note);
+    this.trigger(1, note);
   }
 }
 
@@ -155,34 +159,54 @@ SFXR.prototype.generateIntoBuffer = function(samples, data, dataOffset) {
   return generated;
 };
 
-SFXR.prototype.attack = function() {
-  const x = this.A.value;
-  this.ad = (this.ad & 0x0f) | ((x&0xf) << 4);
-  this.synth.poke(0x05, this.ad);
+SFXR.prototype.offset = function(osc) {
+  return (osc)*7;
+};
+
+SFXR.prototype.attack = function(osc) {
+  const x = this.A[osc].value;
+  this.ad[osc] = (this.ad[osc] & 0x0f) | ((x&0xf) << 4);
+  this.synth.poke(0x05 + this.offset(osc), this.ad[osc]);
 }
 
-SFXR.prototype.decay = function() {
-  const x = this.D.value;
-  this.ad = (this.ad & 0xf0) | (x&0xf);
-  this.synth.poke(0x05, this.ad);
+SFXR.prototype.decay = function(osc) {
+  const x = this.D[osc].value;
+  this.ad[osc] = (this.ad[osc] & 0xf0) | (x&0xf);
+  this.synth.poke(0x05 + this.offset(osc), this.ad[osc]);
 }
 
-SFXR.prototype.sustain = function() {
-  const x = this.S.value;
-  this.sr = (this.sr & 0x0f) | ((x&0xf) << 4);
-  this.synth.poke(0x06, this.sr);
+SFXR.prototype.sustain = function(osc) {
+  const x = this.S[osc].value;
+  this.sr[osc] = (this.sr[osc] & 0x0f) | ((x&0xf) << 4);
+  this.synth.poke(0x06 + this.offset(osc), this.sr[osc]);
 }
 
-SFXR.prototype.release = function() {
-  const x = this.R.value;
-  this.sr = (this.sr & 0xf0) | (x&0xf);
-  this.synth.poke(0x06, this.sr);
+SFXR.prototype.release = function(osc) {
+  const x = this.R[osc].value;
+  this.sr[osc] = (this.sr[osc] & 0xf0) | (x&0xf);
+  this.synth.poke(0x06 + this.offset(osc), this.sr[osc]);
 }
 
-SFXR.prototype.pulsewidth = function() {
-  const x = this.PW.value;
-  this.synth.poke(0x02, x & 0xf);
-  this.synth.poke(0x03, x >> 8);
+SFXR.prototype.pulsewidth = function(osc) {
+  const x = this.PW[osc].value;
+  this.synth.poke(0x02 + this.offset(osc), x & 0xf);
+  this.synth.poke(0x03 + this.offset(osc), x >> 8);
+}
+
+SFXR.prototype.waveforms = function(osc) {
+  let x = 0;
+  this.WAVEFORMS[osc].forEach((cb) => {
+    x <<= 1;
+    if (cb.checked) x += 1;
+  });
+  this.ctrl[osc] = (this.ctrl[osc] & 0x0f) | (x<<4);
+  this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
+}
+
+SFXR.prototype.ctrlbits = function(osc) {
+  const x = (this.ring.checked ? 4 : 0) | (this.sync.checked ? 2 : 0);
+  this.ctrl[osc] = (this.ctrl[osc] & 0xf9) | x;
+  this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
 }
 
 SFXR.prototype.filtertype = function() {
@@ -206,22 +230,12 @@ SFXR.prototype.filtercutoff = function() {
   this.synth.poke(0x16, (x >> 3) & 0xff);
 }
 
-SFXR.prototype.waveforms = function() {
-  let x = 0;
-  this.WAVEFORMS.forEach((cb) => {
-    x <<= 1;
-    if (cb.checked) x += 1;
-  });
-  this.ctrl = (this.ctrl & 0xf) | (x<<4);
-  this.synth.poke(0x04, this.ctrl);
+SFXR.prototype.clearGate = function(osc) {
+  this.ctrl[osc] &= ~1;
+  this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
 }
 
-SFXR.prototype.clearGate = function() {
-  this.ctrl &= ~1;
-  this.synth.poke(0x04, this.ctrl);
-}
-
-SFXR.prototype.trigger = function(note) {
+SFXR.prototype.trigger = function(osc, note) {
   console.log(note);
   const NOTEMAP = {
     'c-0': 0x4540,
@@ -254,9 +268,9 @@ SFXR.prototype.trigger = function(note) {
 
   // Set frequency to C-3
   // http://sta.c64.org/cbm64sndfreq.html
-  this.synth.poke(0x01, reg16 >> 8);
-  this.synth.poke(0x00, reg16 & 0xff);
+  this.synth.poke(0x01 + this.offset(osc), reg16 >> 8);
+  this.synth.poke(0x00 + this.offset(osc), reg16 & 0xff);
 
-  this.ctrl |= 1;
-  this.synth.poke(0x04, this.ctrl);
+  this.ctrl[osc] |= 1;
+  this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
 }
