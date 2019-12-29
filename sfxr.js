@@ -37,16 +37,10 @@ SFXR = function(opts) {
     ['noi1', 'pul1', 'saw1', 'tri1'],
     ['noi2', 'pul2', 'saw2', 'tri2'],
   ].map(ids => ids.map(id => document.getElementById(id)));
-  this.ring = document.getElementById('ring');
-  this.sync = document.getElementById('sync');
 
-  this.OFF = document.getElementById('OFF');
-  this.LP = document.getElementById('LP');
-  this.BP = document.getElementById('BP');
-  this.HP = document.getElementById('HP');
-  this.FC = document.getElementById('FC');
-  this.Q = document.getElementById('Q');
-  this.FM = document.getElementById('FM');
+  ['ring', 'sync', 'OFF', 'LP', 'BP', 'HP', 'FC', 'Q', 'FM'].forEach(s => {
+    this[s] = document.getElementById(s);
+  });
 
   this.palette = new Map(['light-blue', 'blue'].map(c => [
     c, getComputedStyle(document.documentElement).getPropertyValue('--'+c)
@@ -56,6 +50,22 @@ SFXR = function(opts) {
   this.gfx.strokeStyle = 'white';
 
   this.initSID();
+
+  navigator.requestMIDIAccess().then(
+    midiAccess => {
+      for (var inp of midiAccess.inputs.values()) {
+        inp.onmidimessage = msg => {
+          console.log(msg);
+          if (144 == msg[0]) {
+            this.trigger(1, SFXR.msg[1]%24);
+          } else if (128 == msg[1]) {
+            this.clearGate(1);
+          }
+        };
+      }
+    },
+    () => console.log('Could not access MIDI device.')
+  );
 };
 
 // Pico.js hook for processing
@@ -122,29 +132,29 @@ SFXR.prototype.keyup = function(key) {
 
 SFXR.prototype.keydown = function(key) {
   const KEYMAP = {
-    'z': 'c-0',
-    's': 'c#0',
-    'x': 'd-0',
-    'd': 'd#0',
-    'c': 'e-0',
-    'v': 'f-0',
-    'g': 'f#0',
-    'b': 'g-0',
-    'h': 'g#0',
-    'n': 'a-0',
-    'j': 'a#0',
-    'm': 'b-0',
-    'q': 'c-1',
-    '2': 'c#1',
-    'w': 'd-1',
-    '3': 'd#1',
-    'e': 'e-1',
-    'r': 'f-1',
-    '5': 'f#1',
-    't': 'g-1',
-    '6': 'g#1',
-    'y': 'a-1',
-    '7': 'a#1',
+    'z': 0,
+    's': 1,
+    'x': 2,
+    'd': 3,
+    'c': 4,
+    'v': 5,
+    'g': 6,
+    'b': 7,
+    'h': 8,
+    'n': 9,
+    'j': 10,
+    'm': 11,
+    'q': 12,
+    '2': 13,
+    'w': 14,
+    '3': 15,
+    'e': 16,
+    'r': 17,
+    '5': 18,
+    't': 19,
+    '6': 20,
+    'y': 21,
+    '7': 22,
   }
   const note = KEYMAP[key.toLowerCase()];
   if (note && this.lastPlayedKey != key) {
@@ -239,33 +249,34 @@ SFXR.prototype.clearGate = function(osc) {
   this.synth.poke(0x04 + this.offset(osc), this.ctrl[osc]);
 }
 
+SFXR.NOTEMAP = [
+  0x4540,
+  0x495e,
+  0x4dbb,
+  0x525a,
+  0x573f,
+  0x5c6f,
+  0x61ef,
+  0x67c2,
+  0x6ded,
+  0x7476,
+  0x7b63,
+  0x82b9,
+  0x8a7f,
+  0x92bc,
+  0x9b75,
+  0xa4b4,
+  0xae7f,
+  0xb8df,
+  0xc3de,
+  0xcf84,
+  0xdbd9,
+  0xe8ed,
+  0xf6c6,
+];
+
 SFXR.prototype.trigger = function(osc, note) {
-  const NOTEMAP = {
-    'c-0': 0x4540,
-    'c#0': 0x495e,
-    'd-0': 0x4dbb,
-    'd#0': 0x525a,
-    'e-0': 0x573f,
-    'f-0': 0x5c6f,
-    'f#0': 0x61ef,
-    'g-0': 0x67c2,
-    'g#0': 0x6ded,
-    'a-0': 0x7476,
-    'a#0': 0x7b63,
-    'b-0': 0x82b9,
-    'c-1': 0x8a7f,
-    'c#1': 0x92bc,
-    'd-1': 0x9b75,
-    'd#1': 0xa4b4,
-    'e-1': 0xae7f,
-    'f-1': 0xb8df,
-    'f#1': 0xc3de,
-    'g-1': 0xcf84,
-    'g#1': 0xdbd9,
-    'a-1': 0xe8ed,
-    'a#1': 0xf6c6,
-  };
-  const reg16 = NOTEMAP[note] / 32;
+  const reg16 = SFXR.NOTEMAP[note] / 32;
   // because Chrome requires a click before sound can start.
   this.play();
 
